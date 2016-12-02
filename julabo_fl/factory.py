@@ -30,9 +30,9 @@ class JulaboFactory:
         logger.addHandler(fh)
         return logger
 
-    def create_julabo(self, device='/dev/ttyUSBx', logger=None):
+    def create_julabo(self, device='/dev/ttyUSB2', logger=None):
         if logger is None:
             logger = self.get_logger()
 
         protocol = JulaboProtocol(logger=logger)
-        return JulaboDriver(Serial(device, 4800, 8, 'E', 1, 0.4), protocol)
+        return JulaboDriver(Serial(device, 4800, 7, 'E', 1, 0.4), protocol)

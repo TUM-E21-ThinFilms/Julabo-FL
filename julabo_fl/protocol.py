@@ -50,10 +50,21 @@ class JulaboProtocol(Protocol):
             self.logger.exception("Error while sending message")
             raise CommunicationError("Could not send message. timeout")
 
+    def _read(self, transport):
+        msg = []
+	try:
+            while True:
+                msg.append(transport.read_bytes(1))
+        except:
+            pass
+
+	return msg
+
     def _receive_message(self, transport):
         try:
             msg = transport.read_until("\r\n")
             self.logger.debug("Received message %s", repr(msg))
+            return msg
         except slave.transport.Timeout:
             self.logger.exception("Error while receiving message")
             raise CommunicationError("Could not receive message. timeout")
@@ -63,4 +74,4 @@ class JulaboProtocol(Protocol):
 
     def query(self, transport, message):
         self._send_message(transport, message)
-        return self._receive_message(transport)
+        return "".join(map(chr, self._receive_message(transport)))
