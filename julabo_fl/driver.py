@@ -37,7 +37,14 @@ class JulaboDriver(object):
         return self._protocol.write(self._transport, cmd)
 
     def set_setpoint(self, temperature):
-        self._write('OUT_SP_00 ' + temperature)
+        if temperature > 25 or temperature < 5:
+            raise ValueError("temperature must be in range [5,25]")
+
+        # only 2 digits behind . allowed
+        if int(temperature * 100) != temperature * 100:
+            raise ValueError("temperature too precise")
+
+        self._write('OUT_SP_00 ' + str(temperature))
 
     def turn_on(self):
         self._write('OUT_MODE_05 1')
