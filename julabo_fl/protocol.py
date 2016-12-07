@@ -15,6 +15,8 @@
 
 import slave
 
+import e21_util
+
 from e21_util.lock import InterProcessTransportLock
 from e21_util.error import CommunicationError
 
