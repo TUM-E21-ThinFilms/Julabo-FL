@@ -37,11 +37,12 @@ class JulaboProtocol(Protocol):
         return ''.join(msg).encode(self.encoding)
 
     def clear(self, transport):
-        while True:
-            try:
-                transport.read_bytes(25)
-            except Timeout:
-                return True
+        with InterProcessTransportLock(transport):
+            while True:
+                try:
+                    transport.read_bytes(25)
+                except Timeout:
+                    return True
 
     def _send_message(self, transport, message):
         try:
