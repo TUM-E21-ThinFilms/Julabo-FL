@@ -17,7 +17,7 @@ import sys
 
 from setuptools import setup, find_packages
 
-requires = ['slave']
+requires = ['slave', 'fasteners']
 
 desc = ('An implementation of the Julabo FL RS232 interface')
 

@@ -15,9 +15,9 @@
 
 import logging
 
-from slave.transport import Serial
 from protocol import JulaboProtocol
 from driver import JulaboDriver
+from e21_util.transport import Serial
 
 class JulaboFactory:
     def get_logger(self):
