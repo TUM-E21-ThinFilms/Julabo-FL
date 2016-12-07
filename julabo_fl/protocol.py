@@ -73,10 +73,10 @@ class JulaboProtocol(Protocol):
 
 
     def write(self, transport, message):
-        with e21_util.InterProcessTransportLock(transport):
+        with InterProcessTransportLock(transport):
             self._send_message(transport, message)
 
     def query(self, transport, message):
-        with e21_util.InterProcessTransportLock(transport):
+        with InterProcessTransportLock(transport):
             self._send_message(transport, message)
             return "".join(map(chr, self._receive_message(transport)))
