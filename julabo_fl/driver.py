@@ -59,10 +59,10 @@ class JulaboDriver(object):
         return self._query('STATUS')
 
     def get_setpoint(self):
-        return self._query('IN_SP_00')
+        return float(self._query('IN_SP_00'))
 
     def get_temperature(self):
-        return self._query('IN_PV_00')
+        return float(self._query('IN_PV_00'))
 
     def get_on(self):
-        return self._query('IN_MODE_05')
+        return int(self._query('IN_MODE_05'))
