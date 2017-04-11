@@ -16,7 +16,7 @@
 from protocol import JulaboProtocol
 from driver import JulaboDriver
 from e21_util.transport import Serial
-from e21_util.logging import get_sputter_logger
+from e21_util.log import get_sputter_logger
 
 class JulaboFactory:
     def get_logger(self):
