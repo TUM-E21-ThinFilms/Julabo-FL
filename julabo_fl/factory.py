@@ -17,14 +17,18 @@ from protocol import JulaboProtocol
 from driver import JulaboDriver
 from e21_util.transport import Serial
 from e21_util.log import get_sputter_logger
+from e21_util.ports import Ports
 
 class JulaboFactory:
     def get_logger(self):
         return get_sputter_logger('Julabo FL4003', 'julabo.log')
 
-    def create_julabo(self, device='/dev/ttyUSB2', logger=None):
+    def create_julabo(self, device=None, logger=None):
         if logger is None:
             logger = self.get_logger()
+
+        if device is None:
+            device = Ports().get_port(Ports.DEVICE_JULABO)
 
         protocol = JulaboProtocol(logger=logger)
         return JulaboDriver(Serial(device, 4800, 7, 'E', 1, 0.4), protocol)
