@@ -65,4 +65,4 @@ class JulaboDriver(object):
         return float(self._query('IN_PV_00'))
 
     def get_on(self):
-        return int(self._query('IN_MODE_05'))
+        return bool(self._query('IN_MODE_05'))
