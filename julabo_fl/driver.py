@@ -13,28 +13,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from slave.driver import Driver, Command
-
-from protocol import JulaboProtocol
+from julabo_fl.protocol import JulaboProtocol
 
 class JulaboDriver(object):
 
-    def __init__(self, transport, protocol=None):
-
+    def __init__(self, protocol):
+        assert isinstance(protocol, JulaboProtocol)
         if protocol is None:
             protocol = JulaboProtocol()
 
-        self._transport = transport
         self._protocol = protocol
 
     def clear(self):
-        self._protocol.clear(self._transport)
+        self._protocol.clear()
 
     def _query(self, cmd):
-        return self._protocol.query(self._transport, cmd)
+        return self._protocol.query(cmd)
 
     def _write(self, cmd):
-        return self._protocol.write(self._transport, cmd)
+        return self._protocol.write(cmd)
 
     def set_setpoint(self, temperature):
         if temperature > 40 or temperature < 5:
