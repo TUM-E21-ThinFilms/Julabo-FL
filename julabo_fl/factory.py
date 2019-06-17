@@ -23,7 +23,7 @@ class JulaboFactory:
     def get_logger(self):
         return get_sputter_logger('Julabo FL4003', 'julabo.log')
 
-    def create_julabo(self, device=None, logger=None):
+    def create(self, device=None, logger=None):
         if logger is None:
             logger = self.get_logger()
 
