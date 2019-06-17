@@ -13,20 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import slave
-
-import e21_util
-
-from e21_util.lock import InterProcessTransportLock
 from e21_util.error import CommunicationError
+from e21_util.interface import Loggable
+from e21_util.serial_connection import AbstractTransport, SerialTimeoutException
 
-from slave.protocol import Protocol
-from slave.transport import Timeout
+class JulaboProtocol(Loggable):
 
-class JulaboProtocol(Protocol):
+    def __init__(self, transport, logger):
+        super(JulaboProtocol, self).__init__(logger)
+        assert isinstance(transport, AbstractTransport)
 
-    def __init__(self, logger=None):
-        self.logger = logger
+        self._transport = transport
         self.encoding = 'ascii'
 
     def create_message(self, header, *data):
@@ -36,48 +33,37 @@ class JulaboProtocol(Protocol):
         msg.append("\r\n")
         return ''.join(msg).encode(self.encoding)
 
-    def clear(self, transport):
-        with InterProcessTransportLock(transport):
+    def clear(self):
+        with self._transport:
             while True:
                 try:
-                    transport.read_bytes(25)
-                except Timeout:
+                    self._transport.read_bytes(25)
+                except SerialTimeoutException:
                     return True
 
-    def _send_message(self, transport, message):
+    def _send_message(self, message):
         try:
             raw_message = message + "\r"
-            self.logger.debug("Seding message %s", repr(message))
-            transport.write(raw_message)
-        except slave.transport.Timeout:
-            self.logger.exception("Error while sending message")
+            self._logger.debug("Sending message %s", repr(message))
+            self._transport.write(raw_message)
+        except SerialTimeoutException:
+            self._logger.exception("Error while sending message")
             raise CommunicationError("Could not send message. timeout")
 
-    def _read(self, transport):
-        msg = []
+    def _receive_message(self):
         try:
-            while True:
-                msg.append(transport.read_bytes(1))
-        except:
-            pass
+            msg = self._transport.read_until("\r\n")
+            self._logger.debug("Received message %s", repr(msg))
+            return "".join(map(chr, msg))
+        except SerialTimeoutException:
+            self._logger.exception("Error while receiving message")
+            raise CommunicationError("Could not receive message. Timeout")
 
-        return msg
+    def write(self, message):
+        with self._transport:
+            self._send_message(message)
 
-    def _receive_message(self, transport):
-        try:
-            msg = transport.read_until("\r\n")
-            self.logger.debug("Received message %s", repr(msg))
-            return msg
-        except slave.transport.Timeout:
-            self.logger.exception("Error while receiving message")
-            raise CommunicationError("Could not receive message. timeout")
-
-
-    def write(self, transport, message):
-        with InterProcessTransportLock(transport):
-            self._send_message(transport, message)
-
-    def query(self, transport, message):
-        with InterProcessTransportLock(transport):
-            self._send_message(transport, message)
-            return "".join(map(chr, self._receive_message(transport)))
+    def query(self, message):
+        with self._transport:
+            self._send_message(message)
+            return self._receive_message()

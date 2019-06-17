@@ -13,22 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from protocol import JulaboProtocol
-from driver import JulaboDriver
-from e21_util.transport import Serial
-from e21_util.log import get_sputter_logger
-from e21_util.ports import Ports
+from julabo_fl.protocol import JulaboProtocol
+from julabo_fl.driver import JulaboDriver
 
-class JulaboFactory:
-    def get_logger(self):
-        return get_sputter_logger('Julabo FL4003', 'julabo.log')
 
-    def create(self, device=None, logger=None):
-        if logger is None:
-            logger = self.get_logger()
-
-        if device is None:
-            device = Ports().get_port(Ports.DEVICE_JULABO)
-
-        protocol = JulaboProtocol(logger=logger)
-        return JulaboDriver(Serial(device, 4800, 7, 'E', 1, 0.4), protocol)
+class JulaboFactory(object):
+    @staticmethod
+    def create(transport, logger):
+        return JulaboDriver(JulaboProtocol(transport, logger))
